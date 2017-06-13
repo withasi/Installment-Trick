@@ -18,98 +18,119 @@
         }
 
         #leveragePercent {
-            margin-top: 7px;
+            margin-top: 4px;
         }
 
         button {
-            margin: 50px 104px
+            margin: 10px 13px 10px 300px;
         }
 
         #realInterest {
-            display: inline-block;
-            min-width: 100px;
-            margin-left: 50px;
+            display: block;
             border: 1px solid #aaa;
             padding: 10px;
         }
 
+        .content {
+            border: 1px solid #ff2255;
+            border-radius: 5px;
+            display: inline-block;
+            margin: 10px;
+            padding: 10px;
+            width: 378px;
+        }
+
+        .main {
+            margin: 0 auto;
+            width: 500px;
+        }
+
+        #result {
+            display: none;
+        }
+
     </style>
-    <script>
-        function go() {
-            var amount = parseFloat(document.getElementById("amount").value);
-            var months = parseInt(document.getElementById("months").value);
-            var percentPerMonth = parseFloat(document.getElementById("percentPerMonth").value)
-            var leveragePercent = parseFloat(document.getElementById("leveragePercent").value)
-            console.log(months)
-            var realInterest = calculateRealInterest(amount, months, percentPerMonth);
-            var leverageInterest = calculateLeverageInterest(amount, months, leveragePercent);
 
-            display(realInterest, leverageInterest);
-        }
-
-        function display(realInterest, leverageInterest) {
-            var content = "你将支付给银行的手续费总共： " + realInterest.interestAmount + "<br>" +
-                "相当于实际占用了银行一年的钱数： " + realInterest.occupyAmountForOneYear + "<br>" +
-                "银行收取你的实际年化利率是： " + realInterest.realInterest * 100 + "% <br>";
-
-            if (!isNaN(leverageInterest)) {
-                content += "你的杠杆将能够获得的收益是： " + leverageInterest + "<br>" +
-                    "你最终实际盈亏： " + (leverageInterest - realInterest.interestAmount);
-            }
-
-            document.getElementById("realInterest").innerHTML = content;
-        }
-
-        function calculateRealInterest(amount, months, percentPerMonth) {
-
-            var interestAmount = amount * percentPerMonth / 100 * months; //总手续费
-
-            var amountPermonth = amount / months; //每期占用银行金额
-            var occupyMonths = (1 + months) * (months / 2); //总占用月数
-            var occupyYears = occupyMonths / 12; //占用年数
-
-            var occupyAmountForOneYear = amountPermonth * occupyYears; //相当于占用了一年的金额
-
-            var realInterest = interestAmount / occupyAmountForOneYear; //实际年化利率
-
-            return {
-                interestAmount: interestAmount,
-                occupyAmountForOneYear: occupyAmountForOneYear,
-                realInterest: realInterest
-            };
-        }
-
-        function calculateLeverageInterest(amount, months, leveragePercent) {
-            var perMonthInterest = leveragePercent / 100 / 12;
-            var interestAmount = (1 + months) * months / 2 * perMonthInterest * amount / months;
-            return interestAmount;
-        }
-    </script>
 </head>
 <body>
 <div style="font-weight:bold;color:#ff2255">全TM是套路，天下很少掉馅饼，除非手续费够低低低</div>
-<div style="font-weight:bold">分期业务（一般指按月等额本金+手续费）实际利率计算方法</div>
+<div style="font-weight:bold">分期业务（一般指按月等额本金+手续费）实际利率计算方法:</div>
 
-<br/>
+<div class="main">
 
-<br/>
+    <div class="content">
+        <span>金额:</span><input id="amount"></input>
+        <br>
+        <span>分:</span><input placeholder="12" id="months" style="width:30px" value="12"></input>期
+        <br>
+        <span>每期:</span><input id="percentPerMonth" style="width:30px"></input>%手续费
+        <br>
+        <div>
+            <span class="count">如果有一个年化收益为：</span><input style="width:30px" id="leveragePercent"></input>%的理财项目 （选填）
+        </div>
+        <br>
 
+        <button onclick="go();">计算</button>
 
-<span>金额:</span><input id="amount"></input>
-<br>
-<span>分:</span><input placeholder="12" id="months" style="width:30px" value="12"></input>期
-<br>
-<span>每期:</span><input id="percentPerMonth" style="width:30px"></input>%手续费
-<br>
-<div>
-    <span class="count">如果有一个年化收益为：</span><input style="width:30px" id="leveragePercent"></input>%的理财项目 （选填）
+    </div>
+
+    <div class="content" id="result">
+        <div>计算结果：</div>
+        <label id="realInterest"/>
+    </div>
+
 </div>
-<br>
-
-<button onclick="go();">计算</button>
-
-<br><br><br>
-
-<span>结果：</span> <br><label id="realInterest"></label>
 </body>
+<script>
+    function go() {
+        var amount = parseFloat(document.getElementById("amount").value);
+        var months = parseInt(document.getElementById("months").value);
+        var percentPerMonth = parseFloat(document.getElementById("percentPerMonth").value)
+        var leveragePercent = parseFloat(document.getElementById("leveragePercent").value)
+
+        var realInterest = calculateRealInterest(amount, months, percentPerMonth);
+        var leverageInterest = calculateLeverageInterest(amount, months, leveragePercent);
+
+        document.getElementById('result').style.display = "block";
+        display(realInterest, leverageInterest);
+    }
+
+    function display(realInterest, leverageInterest) {
+        var content = "你将支付给银行的手续费总共： " + realInterest.interestAmount + "<br>" +
+            "相当于实际占用了银行一年的钱数： " + realInterest.occupyAmountForOneYear + "<br>" +
+            "银行收取你的实际年化利率是： " + realInterest.realInterest * 100 + "% <br>";
+
+        if (!isNaN(leverageInterest)) {
+            content += "你的杠杆将能够获得的收益是： " + leverageInterest + "<br>" +
+                "你最终实际盈亏： " + (leverageInterest - realInterest.interestAmount);
+        }
+
+        document.getElementById("realInterest").innerHTML = content;
+    }
+
+    function calculateRealInterest(amount, months, percentPerMonth) {
+
+        var interestAmount = amount * percentPerMonth / 100 * months; //总手续费
+
+        var amountPermonth = amount / months; //每期占用银行金额
+        var occupyMonths = (1 + months) * (months / 2); //总占用月数
+        var occupyYears = occupyMonths / 12; //占用年数
+
+        var occupyAmountForOneYear = amountPermonth * occupyYears; //相当于占用了一年的金额
+
+        var realInterest = interestAmount / occupyAmountForOneYear; //实际年化利率
+
+        return {
+            interestAmount: interestAmount,
+            occupyAmountForOneYear: occupyAmountForOneYear,
+            realInterest: realInterest
+        };
+    }
+
+    function calculateLeverageInterest(amount, months, leveragePercent) {
+        var perMonthInterest = leveragePercent / 100 / 12;
+        var interestAmount = (1 + months) * months / 2 * perMonthInterest * amount / months;
+        return interestAmount;
+    }
+</script>
 </html>
