@@ -22,7 +22,9 @@
         }
 
         button {
-            margin: 10px 13px 10px 300px;
+            margin: 10px;
+            float: right;
+            padding: 8px 15px;
         }
 
         #realInterest {
@@ -49,6 +51,17 @@
             display: none;
         }
 
+        .material-design {
+            position: relative;
+        }
+
+        .material-design canvas {
+            opacity: 0.25;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
     </style>
 
 </head>
@@ -58,7 +71,7 @@
 
 <div class="main">
 
-    <div class="content">
+    <section class="content">
         <span>金额:</span><input id="amount"></input>
         <br>
         <span>分:</span><input placeholder="12" id="months" style="width:30px" value="12"></input>期
@@ -70,14 +83,14 @@
         </div>
         <br>
 
-        <button onclick="go();">计算</button>
+        <button class="material-design" data-color="#f34711" onclick="go();">计算</button>
 
-    </div>
+    </section>
 
-    <div class="content" id="result">
+    <section class="content" id="result">
         <div>计算结果：</div>
         <label id="realInterest"/>
-    </div>
+    </section>
 
 </div>
 </body>
@@ -132,5 +145,65 @@
         var interestAmount = (1 + months) * months / 2 * perMonthInterest * amount / months;
         return interestAmount;
     }
+
+
+    //canvas 绘制动态button
+    var centerX = 0,
+        centerY = 0,
+        color = '',
+        containers = document.getElementsByClassName('material-design'),
+        context = {},
+        element = {},
+        radius = 0;
+
+    var requestAnimFrame = function () {
+        return (
+            this.requestAnimationFrame ||
+            this.mozRequestAnimationFrame ||
+            this.oRequestAnimationFrame ||
+            this.msRequestAnimationFrame ||
+            function (callback) {
+                this.setTimeout(callback, 1000 / 60);
+            }
+        );
+    }();
+
+    function init() {
+        for (var i = 0; i < containers.length; i += 1) {
+            var canvas = document.createElement('canvas');
+            canvas.addEventListener('click', press, false);
+
+            containers[i].appendChild(canvas);
+            canvas.style.width = '100%';
+            canvas.style.height = '100%';
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        }
+    }
+
+    function press(event) {
+        color = event.toElement.parentElement.dataset.color;
+        element = event.toElement;
+        context = element.getContext('2d');
+        radius = 0;
+        centerX = event.offsetX;
+        centerY = event.offsetY;
+        context.clearRect(0, 0, element.width, element.height);
+        draw();
+    }
+    function draw() {
+        context.beginPath();
+        context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+        context.fillStyle = color;
+        context.fill();
+        radius += 2;
+        if (radius < element.width) {
+            requestAnimFrame(draw);
+        }
+    }
+
+    init();
+
+
 </script>
 </html>
